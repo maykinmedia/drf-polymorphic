@@ -1,0 +1,8 @@
+include *.rst
+include LICENSE
+recursive-include drf_polymorphic *.html
+recursive-include drf_polymorphic *.txt
+recursive-include drf_polymorphic *.po
+global-exclude __pycache__
+global-exclude *.py[co]
+
