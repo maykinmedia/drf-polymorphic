@@ -16,6 +16,8 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.admin",
+    "rest_framework",
+    "drf_spectacular",
     "drf_polymorphic",
     "testapp",
 ]
