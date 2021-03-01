@@ -7,7 +7,7 @@ def test_get_pets(api_client):
 
     response = api_client.get(url)
 
-    assert response.status == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
     expected_data = [
         {"name": "Snowball", "pet_type": "cat", "hunting_skill": "lazy"},
@@ -16,3 +16,17 @@ def test_get_pets(api_client):
     ]
 
     assert response.json() == expected_data
+
+
+def test_get_schema(api_client):
+    url = reverse("schema-json")
+
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    schema = response.json()
+    pet_schema = schema["components"]["schemas"]["PetPolymorphic"]
+
+    assert "discriminator" in pet_schema
+    assert pet_schema["discriminator"]["propertyName"] == "pet_type"
