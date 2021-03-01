@@ -1,5 +1,5 @@
-Welcome to drf_polymorphic's documentation!
-=================================================
+drf_polymorphic
+===============
 
 :Version: 0.1.0
 :Source: https://github.com/maykinmedia/drf_polymorphic
@@ -30,10 +30,20 @@ The implementations also includes the extension for ``drf_spectacular`` schema g
 
 Installation
 ============
+Install using pip:
 
 .. code-block:: bash
 
     pip install drf_polymorphic
+
+Then add ``drf_polymorphic`` to installed apps in ``settings.py``:
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # ALL YOUR APPS
+        'drf_polymorphic',
+    ]
 
 
 Usage
@@ -171,6 +181,14 @@ After a path is added to ``urls.py`` the endpoint is ready to use:
             "loves_rocks": true
         }
     ]
+
+
+DRF spectacular
+===============
+
+``drf_polymorphic`` includes an extension for `drf_spectacular <https://drf-spectacular.readthedocs.io/en/latest/>`_
+schema generation. If you use ``drf_spectacular`` in your project this extension will be
+loaded automatically.
 
 
 .. |build-status| image:: https://travis-ci.org/maykinmedia/drf_polymorphic.svg?branch=master
