@@ -189,7 +189,7 @@ schema generation. If you use ``drf_spectacular`` in your project this extension
 loaded automatically.
 
 
-.. |build-status| image:: https://github.com/maykinmedia/drf_polymorphic/workflows/ci/badge.svg
+.. |build-status| image:: https://github.com/maykinmedia/drf-polymorphic/workflows/ci/badge.svg
     :target: https://github.com/maykinmedia/drf-polymorphic/actions/workflows/ci.yml
     :alt: Run CI
 
