@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Run tests Python ${{ matrix.python }}, Django ${{ matrix.django }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [ '3.7', '3.8' ]
+        django: [ '2.2', '3.0' ]
+
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: pip install tox codecov
+
+      - name: Run tests
+        run: |
+          export TOXENV=py${PYTHON_VERSION/./}-django${DJANGO/./}
+          tox
+          codecov -e TOXENV,DJANGO --file reports/coverage-${TOXENV}.xml
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+          DJANGO: ${{ matrix.django }}
+
+      - name: Publish coverage report
+        uses: codecov/codecov-action@v1
