@@ -4,11 +4,9 @@ drf_polymorphic
 :Version: 0.1.0
 :Source: https://github.com/maykinmedia/drf_polymorphic
 :Keywords: django, rest, polymorphic
-:PythonVersion: 3.7
+:PythonVersion: 3.7, 3.8
 
-|build-status| |coverage| |black|
-
-|python-versions| |django-versions| |pypi-version|
+|build-status| |coverage| |linting|
 
 Polymorphic support for DRF without Django models
 
@@ -183,27 +181,22 @@ After a path is added to ``urls.py`` the endpoint is ready to use:
     ]
 
 
-DRF spectacular
-===============
+DRF spectacular support
+=======================
 
 ``drf_polymorphic`` includes an extension for `drf_spectacular <https://drf-spectacular.readthedocs.io/en/latest/>`_
 schema generation. If you use ``drf_spectacular`` in your project this extension will be
 loaded automatically.
 
 
-.. |build-status| image:: https://travis-ci.org/maykinmedia/drf_polymorphic.svg?branch=master
-    :target: https://travis-ci.org/maykinmedia/drf_polymorphic
+.. |build-status| image:: https://github.com/maykinmedia/drf_polymorphic/workflows/ci/badge.svg
+    :target: https://github.com/maykinmedia/drf-polymorphic/actions/workflows/ci.yml
+    :alt: Run CI
 
-.. |coverage| image:: https://codecov.io/gh/maykinmedia/drf_polymorphic/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/maykinmedia/drf_polymorphic
+.. |linting| image:: https://github.com/maykinmedia/drf-polymorphic/workflows/code-quality/badge.svg
+    :target: https://github.com/maykinmedia/drf-polymorphic/actions/workflows/code-quality.yml
+    :alt: Code linting
+
+.. |coverage| image:: https://codecov.io/gh/maykinmedia/drf-polymorphic/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/maykinmedia/drf-polymorphic
     :alt: Coverage status
-
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
-
-.. |python-versions| image:: https://img.shields.io/pypi/pyversions/drf_polymorphic.svg
-
-.. |django-versions| image:: https://img.shields.io/pypi/djversions/drf_polymorphic.svg
-
-.. |pypi-version| image:: https://img.shields.io/pypi/v/drf_polymorphic.svg
-    :target: https://pypi.org/project/drf_polymorphic/
