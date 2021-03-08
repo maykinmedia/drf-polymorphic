@@ -1,8 +1,8 @@
-drf_polymorphic
+DRF-polymorphic
 ===============
 
 :Version: 0.1.0
-:Source: https://github.com/maykinmedia/drf_polymorphic
+:Source: https://github.com/maykinmedia/drf-polymorphic
 :Keywords: django, rest, polymorphic
 :PythonVersion: 3.7, 3.8
 
@@ -18,12 +18,12 @@ of the resource. Usually they have a common base type. The exact type/shape is n
 statically known, but depends on the run-time values.
 
 Unlike `django-rest-polymorphic <https://github.com/apirobot/django-rest-polymorphic>`_
-this implementation doesn't require the usage of ``django-polymorphic`` Model
+this implementation doesn't require the usage of ``django-polymorphic`` model classes
 and can be used even without django models.
 
 The implementations also includes the extension for ``drf_spectacular`` schema generation.
 
-``drf_polymorphic`` is inspired on the vng-api-common `implementation
+``drf-polymorphic`` is inspired on the vng-api-common `implementation
 <https://github.com/VNG-Realisatie/vng-api-common/blob/master/vng_api_common/polymorphism.py>`_
 
 Installation
@@ -32,7 +32,7 @@ Install using pip:
 
 .. code-block:: bash
 
-    pip install drf_polymorphic
+    pip install drf-polymorphic
 
 Then add ``drf_polymorphic`` to installed apps in ``settings.py``:
 
@@ -47,7 +47,7 @@ Then add ``drf_polymorphic`` to installed apps in ``settings.py``:
 Usage
 =====
 
-For example, you have data for pets with structure dependent on the type of the pet:
+For example, you have data for pets where the structure depends on the pet species:
 
 .. code-block:: python
 
@@ -57,6 +57,7 @@ For example, you have data for pets with structure dependent on the type of the 
     @dataclass
     class Pet:
         name: str
+        pet_type = ''
 
 
     @dataclass
@@ -184,7 +185,7 @@ After a path is added to ``urls.py`` the endpoint is ready to use:
 DRF spectacular support
 =======================
 
-``drf_polymorphic`` includes an extension for `drf_spectacular <https://drf-spectacular.readthedocs.io/en/latest/>`_
+``drf-polymorphic`` includes an extension for `drf_spectacular <https://drf-spectacular.readthedocs.io/en/latest/>`_
 schema generation. If you use ``drf_spectacular`` in your project this extension will be
 loaded automatically.
 

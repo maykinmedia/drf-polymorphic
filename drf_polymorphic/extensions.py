@@ -6,7 +6,7 @@ from .serializers import PolymorphicSerializer
 
 class PolymorphicSerializerExtension(OpenApiSerializerExtension):
     """
-    drf-spectacular extension for `PolymorphicSerializer`
+    drf-spectacular extension for :class:`PolymorphicSerializer`
     """
 
     target_class = PolymorphicSerializer
