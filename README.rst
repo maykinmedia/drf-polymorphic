@@ -8,6 +8,8 @@ DRF-polymorphic
 
 |build-status| |coverage| |linting|
 
+|python-versions| |django-versions| |pypi-version|
+
 Polymorphic support for DRF without Django models
 
 Overview
@@ -21,7 +23,7 @@ Unlike `django-rest-polymorphic <https://github.com/apirobot/django-rest-polymor
 this implementation doesn't require the usage of ``django-polymorphic`` model classes
 and can be used even without django models.
 
-The implementations also includes the extension for ``drf_spectacular`` schema generation.
+The implementations also includes the extension for `DRF spectacular`_ schema generation.
 
 ``drf-polymorphic`` is inspired on the vng-api-common `implementation
 <https://github.com/VNG-Realisatie/vng-api-common/blob/master/vng_api_common/polymorphism.py>`_
@@ -57,25 +59,25 @@ For example, you have data for pets where the structure depends on the pet speci
     @dataclass
     class Pet:
         name: str
-        pet_type = ''
+        pet_type = ""
 
 
     @dataclass
     class Cat(Pet):
         hunting_skill: str
-        pet_type: str = 'cat'
+        pet_type = "cat"
 
 
     @dataclass
     class Dog(Pet):
         bark: str
-        pet_type: str = 'dog'
+        pet_type = "dog"
 
 
     @dataclass
     class Lizard(Pet):
         loves_rocks: bool
-        pet_type: str = 'lizard'
+        pet_type = "lizard"
 
 
     cat = Cat(name="Snowball", hunting_skill="lazy")
@@ -106,12 +108,6 @@ Define regular serializers for each ``pet_type``:
     class LizardSerializer(serializers.Serializer):
         loves_rocks = serializers.BooleanField()
 
-
-    class PetPolymorphicSerializer(PolymorphicSerializer):
-        name = serializers.CharField()
-        pet_type = serializers.ChoiceField(
-            choices=[("cat", "cat"), ("dog", "dog"), ("lizard", "lizard")]
-        )
 
 Now a polymorphic serializer can be created, which maps the values of ``pet_type`` with the
 serializers defined above:
@@ -185,9 +181,9 @@ After a path is added to ``urls.py`` the endpoint is ready to use:
 DRF spectacular support
 =======================
 
-``drf-polymorphic`` includes an extension for `drf_spectacular <https://drf-spectacular.readthedocs.io/en/latest/>`_
-schema generation. If you use ``drf_spectacular`` in your project this extension will be
-loaded automatically.
+``drf-polymorphic`` includes an extension for `DRF spectacular`_ schema generation.
+If you use DRF spectacular in your project this extension will be loaded
+automatically.
 
 
 .. |build-status| image:: https://github.com/maykinmedia/drf-polymorphic/workflows/ci/badge.svg
@@ -201,3 +197,12 @@ loaded automatically.
 .. |coverage| image:: https://codecov.io/gh/maykinmedia/drf-polymorphic/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/maykinmedia/drf-polymorphic
     :alt: Coverage status
+
+.. |python-versions| image:: https://img.shields.io/pypi/pyversions/drf-polymorphic.svg
+
+.. |django-versions| image:: https://img.shields.io/pypi/djversions/drf-polymorphic.svg
+
+.. |pypi-version| image:: https://img.shields.io/pypi/v/drf-polymorphic.svg
+    :target: https://pypi.org/project/drf-polymorphic/
+
+.. _DRF spectacular: https://drf-spectacular.readthedocs.io/en/latest/
