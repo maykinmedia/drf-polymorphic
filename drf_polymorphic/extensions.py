@@ -72,7 +72,8 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
                 auto_schema.registry.register(combined)
             sub_components.append((discriminator_value, combined.ref))
 
-        unique_refs = {tuple(ref.items()) for _, ref in sub_components}
+        refs = [tuple(ref.items()) for _, ref in sub_components]
+        unique_refs = list(dict.fromkeys(refs))
 
         return {
             "oneOf": [dict(ref) for ref in unique_refs],
