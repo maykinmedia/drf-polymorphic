@@ -173,7 +173,6 @@ Let's display all the pets with GET request:
 
     HTTP/1.0 200 OK
     Content-Type: application/json
-
     [
         {
             "name": "Snowball",
@@ -193,7 +192,7 @@ Let's display all the pets with GET request:
     ]
 
 
-The same endpoint can be used for changing data. In this example the request body can
+The same endpoint can be used to change the data. In this example the request body can
 include data of any predefined pet species:
 
 .. code-block:: http
