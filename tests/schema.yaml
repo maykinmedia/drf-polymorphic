@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/pets/:
+    get:
+      operationId: api_pets_retrieve
+      description: ''
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetPolymorphic'
+          description: ''
+    post:
+      operationId: api_pets_create
+      description: ''
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetPolymorphic'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PetPolymorphic'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PetPolymorphic'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetPolymorphic'
+          description: ''
+components:
+  schemas:
+    BarkEnum:
+      enum:
+      - soft
+      - loud
+      type: string
+    Cat:
+      type: object
+      properties:
+        hunting_skill:
+          $ref: '#/components/schemas/HuntingSkillEnum'
+      required:
+      - hunting_skill
+    Dog:
+      type: object
+      properties:
+        bark:
+          $ref: '#/components/schemas/BarkEnum'
+      required:
+      - bark
+    HuntingSkillEnum:
+      enum:
+      - lazy
+      - active
+      type: string
+    Lizard:
+      type: object
+      properties:
+        loves_rocks:
+          type: boolean
+      required:
+      - loves_rocks
+    PetPolymorphic:
+      oneOf:
+      - $ref: '#/components/schemas/PetPolymorphicCat'
+      - $ref: '#/components/schemas/PetPolymorphicDog'
+      - $ref: '#/components/schemas/PetPolymorphicLizard'
+      discriminator:
+        propertyName: pet_type
+        mapping:
+          cat: '#/components/schemas/PetPolymorphicCat'
+          dog: '#/components/schemas/PetPolymorphicDog'
+          lizard: '#/components/schemas/PetPolymorphicLizard'
+    PetPolymorphicCat:
+      allOf:
+      - $ref: '#/components/schemas/PetPolymorphicShared'
+      - $ref: '#/components/schemas/Cat'
+    PetPolymorphicDog:
+      allOf:
+      - $ref: '#/components/schemas/PetPolymorphicShared'
+      - $ref: '#/components/schemas/Dog'
+    PetPolymorphicLizard:
+      allOf:
+      - $ref: '#/components/schemas/PetPolymorphicShared'
+      - $ref: '#/components/schemas/Lizard'
+    PetPolymorphicShared:
+      type: object
+      description: |-
+        Polymorphic serializer base class.
+
+        Note that the discriminator field must exist at the same depth as the mapped serializer
+        fields for the OpenAPI introspection. See
+        https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/ for
+        more information. As such, it's not possible to define something like:
+
+        {
+            "object_type": "foo",
+            "polymorphic_context": {
+                <foo-specific fields>
+            }
+        }
+
+        without explicitly wrapping this in a parent serializer, i.e. - ``polymorphic_context``
+        can not be a PolymorphicSerializer itself, as it requires access to the ``object_type``
+        in the parent scope.
+      properties:
+        name:
+          type: string
+        pet_type:
+          $ref: '#/components/schemas/PetTypeEnum'
+      required:
+      - name
+      - pet_type
+    PetTypeEnum:
+      enum:
+      - cat
+      - dog
+      - lizard
+      type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Session

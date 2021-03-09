@@ -131,6 +131,14 @@ serializers defined above:
             "lizard": LizardSerializer,
         }
 
+        def create(self, validated_data):
+            pet_type = validated_data.pop("pet_type")
+            pet_class = import_string(f"testapp.data.{pet_type.capitalize()}")
+            new_pet = pet_class(**validated_data)
+            pets.append(new_pet)
+
+            return new_pet
+
 Create ``APIView`` which uses this polymorphic serializer:
 
 .. code-block:: python
@@ -148,13 +156,20 @@ Create ``APIView`` which uses this polymorphic serializer:
             serializer = self.serializer_class(pets, many=True)
             return Response(serializer.data)
 
-After a path is added to ``urls.py`` the endpoint is ready to use:
+        def post(self, request, *args, **kwargs):
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-.. code-block:: bash
 
-    $ http GET "http://localhost:8000/pets/"
+After the path is added to ``urls.py`` the endpoint is ready to use.
+
+Let's display all the pets with GET request:
 
 .. code-block:: http
+
+    GET /pets/ HTTP/1.1
 
     HTTP/1.0 200 OK
     Content-Type: application/json
@@ -176,6 +191,28 @@ After a path is added to ``urls.py`` the endpoint is ready to use:
             "loves_rocks": true
         }
     ]
+
+
+The same endpoint can be used for changing data. In this example the request body can
+include data of any predefined pet species:
+
+.. code-block:: http
+
+    POST /pets/ HTTP/1.1
+    {
+        "name": "Felix",
+        "pet_type": "cat",
+        "hunting_skill": "active"
+    }
+
+    HTTP/1.0 201 Created
+    {
+        "name": "Felix",
+        "pet_type": "cat",
+        "hunting_skill": "active"
+    }
+
+Now the ``pets`` list will include one more pet, which is the instance of ``Cat`` class.
 
 
 DRF spectacular support

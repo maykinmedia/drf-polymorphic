@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 
-from drf_spectacular.views import SpectacularJSONAPIView
+from drf_spectacular.views import SpectacularYAMLAPIView
 
 from .views import PetView
 
@@ -11,9 +11,7 @@ urlpatterns = [
         "api/",
         include(
             [
-                path(
-                    "", SpectacularJSONAPIView.as_view(schema=None), name="schema-json"
-                ),
+                path("", SpectacularYAMLAPIView.as_view(schema=None), name="schema"),
                 path("pets/", PetView.as_view(), name="pets"),
             ]
         ),

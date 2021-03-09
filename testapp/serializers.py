@@ -1,6 +1,10 @@
+from django.utils.module_loading import import_string
+
 from rest_framework import serializers
 
 from drf_polymorphic.serializers import PolymorphicSerializer
+
+from .data import pets
 
 
 class CatSerializer(serializers.Serializer):
@@ -29,3 +33,11 @@ class PetPolymorphicSerializer(PolymorphicSerializer):
         "dog": DogSerializer,
         "lizard": LizardSerializer,
     }
+
+    def create(self, validated_data):
+        pet_type = validated_data.pop("pet_type")
+        pet_class = import_string(f"testapp.data.{pet_type.capitalize()}")
+        new_pet = pet_class(**validated_data)
+        pets.append(new_pet)
+
+        return new_pet
