@@ -50,7 +50,8 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
                 )
                 generic.schema = build_object_type(
                     description="Generic object",
-                    additionalProperties=True,  # displays 'property name * - any' in ReDoc
+                    # displays 'property name * - any' in ReDoc
+                    additionalProperties=True,
                 )
                 auto_schema.registry.register_on_missing(generic)
                 resolved = generic

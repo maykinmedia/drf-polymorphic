@@ -4,7 +4,6 @@ DRF-polymorphic
 :Version: 0.1.0
 :Source: https://github.com/maykinmedia/drf-polymorphic
 :Keywords: django, rest, polymorphic
-:PythonVersion: 3.7, 3.8, 3.9
 
 |build-status| |coverage| |linting|
 
