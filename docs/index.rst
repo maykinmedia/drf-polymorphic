@@ -6,7 +6,7 @@
 DRF-polymorphic
 ===============
 
-|build-status| |coverage| |linting|
+|build-status| |coverage| |linting| |black| |docs|
 
 |python-versions| |django-versions| |pypi-version|
 
@@ -38,13 +38,15 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. |build-status| image:: https://travis-ci.org/maykinmedia/drf-polymorphic.svg?branch=master
-    :target: https://travis-ci.org/maykinmedia/drf-polymorphic
+.. |build-status| image:: https://github.com/maykinmedia/drf-polymorphic/workflows/ci/badge.svg
+    :target: https://github.com/maykinmedia/drf-polymorphic/actions/workflows/ci.yml
+    :alt: Run CI
 
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+.. |linting| image:: https://github.com/maykinmedia/drf-polymorphic/workflows/code-quality/badge.svg
+    :target: https://github.com/maykinmedia/drf-polymorphic/actions/workflows/code-quality.yml
+    :alt: Code linting
 
-.. |coverage| image:: https://codecov.io/gh/maykinmedia/drf-polymorphic/branch/master/graph/badge.svg
+.. |coverage| image:: https://codecov.io/gh/maykinmedia/drf-polymorphic/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/maykinmedia/drf-polymorphic
     :alt: Coverage status
 
@@ -54,3 +56,10 @@ Indices and tables
 
 .. |pypi-version| image:: https://img.shields.io/pypi/v/drf-polymorphic.svg
     :target: https://pypi.org/project/drf-polymorphic/
+
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+.. |docs| image:: https://readthedocs.org/projects/drf-polymorphic/badge/?version=latest
+    :target: https://drf-polymorphic.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
