@@ -6,7 +6,6 @@ paths:
   /api/pets/:
     get:
       operationId: api_pets_retrieve
-      description: ''
       tags:
       - api
       security:
@@ -22,7 +21,6 @@ paths:
           description: ''
     post:
       operationId: api_pets_create
-      description: ''
       tags:
       - api
       requestBody:
@@ -144,4 +142,4 @@ components:
     cookieAuth:
       type: apiKey
       in: cookie
-      name: Session
+      name: sessionid
