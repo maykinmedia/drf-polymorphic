@@ -4,10 +4,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 from rest_framework import serializers
 from rest_framework.fields import empty
+from rest_framework.utils.serializer_helpers import ReturnDict
 
 SerializerCls = Type[serializers.Serializer]
 SerializerClsOrInstance = Union[serializers.Serializer, SerializerCls]
-Primitive = Union[str, int, float]
 
 
 class PolymorphicSerializer(serializers.Serializer):
@@ -32,12 +32,15 @@ class PolymorphicSerializer(serializers.Serializer):
     """
 
     # mapping of discriminator value to serializer (instance or class)
-    serializer_mapping: Dict[Primitive, SerializerClsOrInstance]
-    _serializer_mapping: Dict[Primitive, serializers.Serializer]
+    serializer_mapping: Dict[str, SerializerClsOrInstance]
+    _serializer_mapping: Dict[str, serializers.Serializer]
 
     # the serializer field that holds the discriminator values
     discriminator_field: str = "object_type"
     strict = True
+
+    # drf-typehints missing in pyright
+    _errors: ReturnDict
 
     def __new__(cls, *args, **kwargs):
         if (mapping := getattr(cls, "serializer_mapping", None)) is None:
@@ -79,12 +82,16 @@ class PolymorphicSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         default = super().to_internal_value(data)
         serializer = self._get_serializer_from_data(data)
+        if serializer is None:
+            return default
         extra = serializer.to_internal_value(data)
         return {**default, **extra}
 
     def is_valid(self, *args, **kwargs):
         valid = super().is_valid(*args, **kwargs)
         extra_serializer = self._get_serializer_from_data(self.validated_data)
+        if extra_serializer is None:
+            return valid
         extra_valid = extra_serializer.is_valid(*args, **kwargs)
         self._errors.update(extra_serializer.errors)
         return valid and extra_valid
@@ -92,11 +99,13 @@ class PolymorphicSerializer(serializers.Serializer):
     def run_validation(self, data=empty):
         value = super().run_validation(data=data)
         extra_serializer = self._get_serializer_from_data(data)
-        validated_data = extra_serializer.run_validation(data)
+        validated_data = (
+            extra_serializer.run_validation(data) if extra_serializer else {}
+        )
         return {**value, **validated_data}
 
     def _discriminator_serializer(
-        self, discriminator_value: Primitive
+        self, discriminator_value: str
     ) -> Optional[serializers.Serializer]:
         try:
             return self._serializer_mapping[discriminator_value]
@@ -118,5 +127,8 @@ class PolymorphicSerializer(serializers.Serializer):
 
     def _get_serializer_from_instance(self, instance):
         discriminator_value = self.discriminator.get_attribute(instance)
+        assert isinstance(
+            discriminator_value, str
+        ), "OpenAPI spec only allows strings as mapping keys"
         serializer = self._discriminator_serializer(discriminator_value)
         return serializer
