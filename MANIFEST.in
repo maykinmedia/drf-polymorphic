@@ -1,5 +1,6 @@
 include *.rst
 include LICENSE
+include drf_polymorphic/py.typed
 recursive-include drf_polymorphic *.html
 recursive-include drf_polymorphic *.txt
 recursive-include drf_polymorphic *.po

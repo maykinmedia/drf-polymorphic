@@ -191,3 +191,13 @@ include data of any predefined pet species:
     }
 
 Now the ``pets`` list will include one more pet, which is the instance of ``Cat`` class.
+
+API schema generation
+=====================
+
+drf-polymorphic has support for drf-spectacular. You can install all the required
+tooling in one go with:
+
+.. code-block:: bash
+
+    pip install drf-polymorphic[spectacular]

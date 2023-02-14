@@ -30,6 +30,7 @@ The implementations also includes the extension for `DRF spectacular`_ schema ge
    :caption: Contents:
 
    quickstart
+   changelog
 
 Indices and tables
 ==================
