@@ -63,3 +63,5 @@ Indices and tables
 .. |docs| image:: https://readthedocs.org/projects/drf-polymorphic/badge/?version=latest
     :target: https://drf-polymorphic.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. _DRF spectacular: https://drf-spectacular.readthedocs.io/
