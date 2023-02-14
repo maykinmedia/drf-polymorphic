@@ -1,4 +1,3 @@
-import warnings
 from typing import Dict, Optional, Type, Union
 
 from django.core.exceptions import ImproperlyConfigured
@@ -33,15 +32,15 @@ class PolymorphicSerializer(serializers.Serializer):
     """
 
     # mapping of discriminator value to serializer (instance or class)
-    serializer_mapping: Optional[Dict[Primitive, SerializerClsOrInstance]] = None
+    serializer_mapping: Dict[Primitive, SerializerClsOrInstance]
+    _serializer_mapping: Dict[Primitive, serializers.Serializer]
 
     # the serializer field that holds the discriminator values
     discriminator_field: str = "object_type"
-    fallback_distriminator_value = None
     strict = True
 
     def __new__(cls, *args, **kwargs):
-        if cls.serializer_mapping is None:
+        if (mapping := getattr(cls, "serializer_mapping", None)) is None:
             raise ImproperlyConfigured(
                 "`{cls}` is missing a `{cls}.serializer_mapping` attribute".format(
                     cls=cls.__name__
@@ -53,25 +52,28 @@ class PolymorphicSerializer(serializers.Serializer):
                 "`{cls}.discriminator_field` must be a string".format(cls=cls.__name__)
             )
 
-        return super().__new__(cls, *args, **kwargs)
+        instance = super().__new__(cls, *args, **kwargs)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # normalize the serializer mapping
+        instance._serializer_mapping = {}
+        for obj_type, serializer_or_cls in mapping.items():
+            if isinstance(serializer_or_cls, serializers.Serializer):
+                serializer = serializer_or_cls
+            else:
+                serializer = serializer_or_cls(*args, **kwargs)
+                serializer.parent = instance
+            instance._serializer_mapping[obj_type] = serializer
 
-        serializer_mapping = self.serializer_mapping
-        self.serializer_mapping = {}
+        return instance
 
-        for object_type, serializer in serializer_mapping.items():
-            if callable(serializer):
-                serializer = serializer(*args, **kwargs)
-                serializer.parent = self
-
-            self.serializer_mapping[object_type] = serializer
+    @property
+    def discriminator(self) -> serializers.Field:
+        return self.fields[self.discriminator_field]
 
     def to_representation(self, instance):
         default = super().to_representation(instance)
         serializer = self._get_serializer_from_instance(instance)
-        extra = serializer.to_representation(instance)
+        extra = serializer.to_representation(instance) if serializer is not None else {}
         return {**default, **extra}
 
     def to_internal_value(self, data):
@@ -93,24 +95,11 @@ class PolymorphicSerializer(serializers.Serializer):
         validated_data = extra_serializer.run_validation(data)
         return {**value, **validated_data}
 
-    def _check_discriminator_value(self, discriminator_value: str) -> str:
-        if (
-            discriminator_value not in self.serializer_mapping
-            and self.fallback_distriminator_value is not None
-        ):
-            warnings.warn(
-                f"Discriminator value {discriminator_value} missing from mapping, "
-                f"falling back to {self.fallback_distriminator_value}",
-                RuntimeWarning,
-            )
-            return self.fallback_distriminator_value
-
-        return discriminator_value
-
-    def _discriminator_serializer(self, discriminator_value: str):
-        discriminator_value = self._check_discriminator_value(discriminator_value)
+    def _discriminator_serializer(
+        self, discriminator_value: Primitive
+    ) -> Optional[serializers.Serializer]:
         try:
-            return self.serializer_mapping[discriminator_value]
+            return self._serializer_mapping[discriminator_value]
         except KeyError as exc:
             if self.strict:
                 raise KeyError(
@@ -120,17 +109,14 @@ class PolymorphicSerializer(serializers.Serializer):
                         value=discriminator_value,
                     )
                 ) from exc
-            else:
-                return serializers.Serializer()
+            return None
 
     def _get_serializer_from_data(self, data):
-        discriminator_value = self.fields[self.discriminator_field].get_value(data)
+        discriminator_value = self.discriminator.get_value(data)
         serializer = self._discriminator_serializer(discriminator_value)
         return serializer
 
     def _get_serializer_from_instance(self, instance):
-        discriminator_value = self.fields[self.discriminator_field].get_attribute(
-            instance
-        )
+        discriminator_value = self.discriminator.get_attribute(instance)
         serializer = self._discriminator_serializer(discriminator_value)
         return serializer

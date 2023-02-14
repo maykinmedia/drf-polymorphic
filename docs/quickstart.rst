@@ -173,13 +173,17 @@ include data of any predefined pet species:
 .. code-block:: http
 
     POST /pets/ HTTP/1.1
+
     {
         "name": "Felix",
         "pet_type": "cat",
         "hunting_skill": "active"
     }
 
+.. code-block:: http
+
     HTTP/1.0 201 Created
+
     {
         "name": "Felix",
         "pet_type": "cat",

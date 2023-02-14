@@ -11,8 +11,10 @@ urlpatterns = [
         "api/",
         include(
             [
-                path("", SpectacularYAMLAPIView.as_view(schema=None), name="schema"),
-                path("pets/", PetView.as_view(), name="pets"),
+                path(
+                    "", SpectacularYAMLAPIView.as_view(schema=None), name="schema"
+                ),  # type:ignore
+                path("pets/", PetView.as_view(), name="pets"),  # type:ignore
             ]
         ),
     ),

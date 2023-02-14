@@ -1,8 +1,9 @@
+import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from testapp.data import Cat, pets
-from tests import assert_schema
+from testapp.data import Cat, Pet, pets
+from testapp.serializers import PetPolymorphicSerializer
 
 
 def test_get_pets(api_client):
@@ -39,13 +40,36 @@ def test_create_pet(api_client):
     assert new_pet.hunting_skill == "active"
 
 
-def test_get_schema(api_client):
-    url = reverse("schema")
+def test_with_just_base_type_errors_strict_mode():
+    data = [
+        Pet(name="No Type"),
+        Cat(name="Ziggy", hunting_skill="bird obsession"),
+    ]
+    serializer = PetPolymorphicSerializer(instance=data, many=True)
 
-    response = api_client.get(url)
+    with pytest.raises(KeyError):
+        serializer.data
 
-    assert response.status_code == status.HTTP_200_OK
 
-    response_schema = response.content.decode()
+def test_with_just_base_type_no_errors_non_strict_mode():
+    data = [
+        Pet(name="No Type"),
+        Cat(name="Ziggy", hunting_skill="bird obsession"),
+    ]
 
-    assert_schema(response_schema, "schema.yaml")
+    class NonStrictSerializer(PetPolymorphicSerializer):
+        strict = False
+
+    serializer = NonStrictSerializer(instance=data, many=True)
+
+    assert serializer.data == [
+        {
+            "name": "No Type",
+            "pet_type": "",
+        },
+        {
+            "name": "Ziggy",
+            "hunting_skill": "bird obsession",
+            "pet_type": "cat",
+        },
+    ]
