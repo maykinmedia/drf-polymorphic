@@ -52,6 +52,9 @@ components:
       - soft
       - loud
       type: string
+      description: |-
+        * `soft` - soft
+        * `loud` - loud
     Cat:
       type: object
       properties:
@@ -71,6 +74,9 @@ components:
       - lazy
       - active
       type: string
+      description: |-
+        * `lazy` - lazy
+        * `active` - active
     Lizard:
       type: object
       properties:
@@ -135,6 +141,10 @@ components:
       - dog
       - lizard
       type: string
+      description: |-
+        * `cat` - cat
+        * `dog` - dog
+        * `lizard` - lizard
   securitySchemes:
     basicAuth:
       type: http
