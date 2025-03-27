@@ -27,8 +27,7 @@ def test_polymorphic_extension_component_names():
     class XView(views.APIView):
         serializer_class = Dummy
 
-        def get(self, *args, **kwargs):
-            ...
+        def get(self, *args, **kwargs): ...
 
     schema = generate_schema("x", view=XView)
 
@@ -48,8 +47,7 @@ def test_polymorphic_extension_alternative_discriminator():
     class XView(views.APIView):
         serializer_class = DummySerializer
 
-        def get(self, *args, **kwargs):
-            ...
+        def get(self, *args, **kwargs): ...
 
     schema = generate_schema("x", view=XView)
 
@@ -73,8 +71,7 @@ def test_polymorphic_extension_generic_subserializer(no_warnings):
     class XView(views.APIView):
         serializer_class = DummySerializer
 
-        def get(self, *args, **kwargs):
-            ...
+        def get(self, *args, **kwargs): ...
 
     schema = generate_schema("x", view=XView)
 
@@ -100,8 +97,7 @@ def test_multiple_occurences_of_same_combined_serializer():
     class XView(views.APIView):
         serializer_class = DummySerializer
 
-        def get(self, *args, **kwargs):
-            ...
+        def get(self, *args, **kwargs): ...
 
     schema = generate_schema("x", view=XView)
 
