@@ -73,3 +73,11 @@ def test_with_just_base_type_no_errors_non_strict_mode():
             "pet_type": "cat",
         },
     ]
+
+
+def test_validate_nullable():
+    serializer = PetPolymorphicSerializer(required=False, allow_null=True, data=None)
+
+    valid = serializer.is_valid()
+
+    assert valid
