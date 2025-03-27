@@ -89,6 +89,8 @@ class PolymorphicSerializer(serializers.Serializer):
 
     def is_valid(self, *args, **kwargs):
         valid = super().is_valid(*args, **kwargs)
+        if self.validated_data is None:
+            return valid
         extra_serializer = self._get_serializer_from_data(self.validated_data)
         if extra_serializer is None:
             return valid
@@ -97,6 +99,10 @@ class PolymorphicSerializer(serializers.Serializer):
         return valid and extra_valid
 
     def run_validation(self, data=empty):
+        (is_empty_value, data) = self.validate_empty_values(data)
+        if is_empty_value:
+            return data
+
         value = super().run_validation(data=data)
         extra_serializer = self._get_serializer_from_data(data)
         validated_data = (
