@@ -1,9 +1,15 @@
 import pytest
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.reverse import reverse
 
+from drf_polymorphic.serializers import PolymorphicSerializer
 from testapp.data import Cat, Pet, pets
-from testapp.serializers import PetPolymorphicSerializer
+from testapp.serializers import (
+    CatSerializer,
+    DogSerializer,
+    LizardSerializer,
+    PetPolymorphicSerializer,
+)
 
 
 def test_get_pets(api_client):
@@ -81,3 +87,29 @@ def test_validate_nullable():
     valid = serializer.is_valid()
 
     assert valid
+
+
+class PetPolymorphicWithDefaultSerializer(PolymorphicSerializer):
+    pet_type = serializers.ChoiceField(
+        choices=[("cat", "cat"), ("dog", "dog"), ("lizard", "lizard")],
+        default="cat",
+    )
+
+    discriminator_field = "pet_type"
+    serializer_mapping = {
+        "cat": CatSerializer,
+        "dog": DogSerializer,
+        "lizard": LizardSerializer,
+    }
+
+
+def test_discriminator_with_default():
+    serializer = PetPolymorphicWithDefaultSerializer(data={"hunting_skill": "lazy"})
+
+    valid = serializer.is_valid()
+
+    assert valid
+    assert serializer.validated_data == {
+        "pet_type": "cat",
+        "hunting_skill": "lazy",
+    }
