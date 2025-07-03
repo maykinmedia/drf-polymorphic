@@ -2,6 +2,14 @@
 Changelog
 =========
 
+2.0.1 (2025-07-03)
+==================
+
+Bugfix release.
+
+* Identified and fixed crash during validation when the discriminator field has a
+  default and is omitted from the initial data.
+
 2.0.0 (2025-03-27)
 ==================
 
