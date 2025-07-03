@@ -80,12 +80,19 @@ class PolymorphicSerializer(serializers.Serializer):
         return {**default, **extra}
 
     def to_internal_value(self, data):
-        default = super().to_internal_value(data)
+        base = super().to_internal_value(data)
+
+        # ensure that the value from field defaults is set!
+        field_name = self.discriminator_field
+        if field_name not in data and field_name in base:
+            assert field_name in base
+            data[field_name] = base[field_name]
+
         serializer = self._get_serializer_from_data(data)
         if serializer is None:
-            return default
+            return base
         extra = serializer.to_internal_value(data)
-        return {**default, **extra}
+        return {**base, **extra}
 
     def is_valid(self, *args, **kwargs):
         valid = super().is_valid(*args, **kwargs)
