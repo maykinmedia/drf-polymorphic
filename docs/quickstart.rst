@@ -114,6 +114,9 @@ serializers defined above:
 
             return new_pet
 
+.. tip:: Use ``None`` in the mapping value if there are no additional fields for that
+   value of the discriminator.
+
 Create ``APIView`` which uses this polymorphic serializer:
 
 .. code-block:: python
