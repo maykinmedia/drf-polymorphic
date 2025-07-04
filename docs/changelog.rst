@@ -2,6 +2,19 @@
 Changelog
 =========
 
+2.1.0 (2025-07-04)
+==================
+
+Small feature release.
+
+* Confirmed Django 5.2 support.
+* You can now map to ``None`` if the value of the discriminator does not require
+  additional fields.
+* You can now use ``models.TextChoices`` values as keys in the ``serializer_mapping``.
+* The discriminator field name is now properly camelized in the drf-spectacular generated
+  schema if the matching post-processing hook is enabled for projects that use
+  djangorestframework-camel-case.
+
 2.0.1 (2025-07-03)
 ==================
 
