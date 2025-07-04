@@ -104,3 +104,28 @@ def test_multiple_occurences_of_same_combined_serializer():
     schemas = schema["components"]["schemas"]
     assert "Dummy" in schemas
     assert len(schemas["Dummy"]["oneOf"]) == 1
+
+
+def test_allow_omitting_mapped_serializer():
+    # not every value is guaranteed to add extra properties. Allow skipping those
+    # with ``None``.
+    class DummySerializer(PolymorphicSerializer):
+        object_type = serializers.ChoiceField(choices=["foo", "bar"])
+        serializer_mapping = {"foo": None}
+
+    class XView(views.APIView):
+        serializer_class = DummySerializer
+
+        def get(self, *args, **kwargs): ...
+
+    schema = generate_schema("x", view=XView)
+
+    schemas = schema["components"]["schemas"]
+    assert "Dummy" in schemas
+    assert schemas["Dummy"] == {
+        "oneOf": [{"$ref": "#/components/schemas/DummyShared"}],
+        "discriminator": {
+            "propertyName": "object_type",
+            "mapping": {"foo": "#/components/schemas/DummyShared"},
+        },
+    }

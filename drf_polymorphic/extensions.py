@@ -39,6 +39,13 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
             discriminator_value,
             sub_serializer,
         ) in serializer.serializer_mapping.items():
+            # some polymorphic entries may not need additional fields, in which case
+            # the ideal approach is map it to `None`. We can short-circuit then, since
+            # there are no additional schemas to extract.
+            if sub_serializer is None:
+                sub_components.append((discriminator_value, main.ref))
+                continue
+
             resolved = auto_schema.resolve_serializer(sub_serializer, direction)
 
             if not resolved.name:

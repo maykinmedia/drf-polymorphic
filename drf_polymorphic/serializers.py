@@ -1,4 +1,5 @@
-from typing import Dict, Optional, Type, Union
+from collections.abc import Mapping
+from typing import TypeAlias
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -6,8 +7,10 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 from rest_framework.utils.serializer_helpers import ReturnDict
 
-SerializerCls = Type[serializers.Serializer]
-SerializerClsOrInstance = Union[serializers.Serializer, SerializerCls]
+SerializerCls = type[serializers.Serializer]
+SerializerClsOrInstance = serializers.Serializer | SerializerCls
+
+SerializerMapping: TypeAlias = Mapping[str, SerializerClsOrInstance | None]
 
 
 class PolymorphicSerializer(serializers.Serializer):
@@ -32,8 +35,8 @@ class PolymorphicSerializer(serializers.Serializer):
     """
 
     # mapping of discriminator value to serializer (instance or class)
-    serializer_mapping: Dict[str, SerializerClsOrInstance]
-    _serializer_mapping: Dict[str, serializers.Serializer]
+    serializer_mapping: SerializerMapping
+    _serializer_mapping: dict[str, serializers.Serializer | None]
 
     # the serializer field that holds the discriminator values
     discriminator_field: str = "object_type"
@@ -43,7 +46,8 @@ class PolymorphicSerializer(serializers.Serializer):
     _errors: ReturnDict
 
     def __new__(cls, *args, **kwargs):
-        if (mapping := getattr(cls, "serializer_mapping", None)) is None:
+        mapping: SerializerMapping | None = getattr(cls, "serializer_mapping", None)
+        if mapping is None:
             raise ImproperlyConfigured(
                 "`{cls}` is missing a `{cls}.serializer_mapping` attribute".format(
                     cls=cls.__name__
@@ -60,11 +64,13 @@ class PolymorphicSerializer(serializers.Serializer):
         # normalize the serializer mapping
         instance._serializer_mapping = {}
         for obj_type, serializer_or_cls in mapping.items():
-            if isinstance(serializer_or_cls, serializers.Serializer):
-                serializer = serializer_or_cls
-            else:
-                serializer = serializer_or_cls(*args, **kwargs)
-                serializer.parent = instance
+            match serializer_or_cls:
+                case serializers.Serializer() | None:
+                    serializer = serializer_or_cls
+                case _:
+                    serializer = serializer_or_cls(*args, **kwargs)
+                    serializer.parent = instance
+
             instance._serializer_mapping[obj_type] = serializer
 
         return instance
@@ -119,7 +125,7 @@ class PolymorphicSerializer(serializers.Serializer):
 
     def _discriminator_serializer(
         self, discriminator_value: str
-    ) -> Optional[serializers.Serializer]:
+    ) -> serializers.Serializer | None:
         try:
             return self._serializer_mapping[discriminator_value]
         except KeyError as exc:
