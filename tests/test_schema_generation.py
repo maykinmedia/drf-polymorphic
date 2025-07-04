@@ -1,3 +1,5 @@
+from django.db import models
+
 from rest_framework import serializers, status, views
 from rest_framework.reverse import reverse
 
@@ -129,3 +131,33 @@ def test_allow_omitting_mapped_serializer():
             "mapping": {"foo": "#/components/schemas/DummyShared"},
         },
     }
+
+
+def test_use_textchoices_for_mapping_keys():
+    class MyChoices(models.TextChoices):
+        first = "one", "First"
+        second = "two", "Second"
+
+    class DummySerializer(PolymorphicSerializer):
+        choice = serializers.ChoiceField(choices=MyChoices.choices)
+        serializer_mapping = {
+            MyChoices.first: None,
+            MyChoices.second: None,
+        }
+
+    class XView(views.APIView):
+        serializer_class = DummySerializer
+
+        def get(self, *args, **kwargs): ...
+
+    schema = generate_schema("x", view=XView)
+
+    schemas = schema["components"]["schemas"]
+    assert "Dummy" in schemas
+
+    assert "one" in schemas["Dummy"]["discriminator"]["mapping"]
+    assert "two" in schemas["Dummy"]["discriminator"]["mapping"]
+    mapping_keys = schemas["Dummy"]["discriminator"]["mapping"].keys()
+    # must be cast to string so that YAML & JSON can properly serialize this
+    for key in mapping_keys:
+        assert not isinstance(key, MyChoices)

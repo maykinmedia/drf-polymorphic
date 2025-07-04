@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from typing import TypeAlias
 
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import TextChoices
 
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -10,7 +11,9 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 SerializerCls = type[serializers.Serializer]
 SerializerClsOrInstance = serializers.Serializer | SerializerCls
 
-SerializerMapping: TypeAlias = Mapping[str, SerializerClsOrInstance | None]
+SerializerMapping: TypeAlias = Mapping[
+    str | TextChoices, SerializerClsOrInstance | None
+]
 
 
 class PolymorphicSerializer(serializers.Serializer):
@@ -71,7 +74,7 @@ class PolymorphicSerializer(serializers.Serializer):
                     serializer = serializer_or_cls(*args, **kwargs)
                     serializer.parent = instance
 
-            instance._serializer_mapping[obj_type] = serializer
+            instance._serializer_mapping[str(obj_type)] = serializer
 
         return instance
 
