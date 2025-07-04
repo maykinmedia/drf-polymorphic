@@ -1,5 +1,6 @@
 from django.db import models
 
+from drf_spectacular.settings import patched_settings
 from rest_framework import serializers, status, views
 from rest_framework.reverse import reverse
 
@@ -161,3 +162,30 @@ def test_use_textchoices_for_mapping_keys():
     # must be cast to string so that YAML & JSON can properly serialize this
     for key in mapping_keys:
         assert not isinstance(key, MyChoices)
+
+
+@patched_settings(
+    {
+        "POSTPROCESSING_HOOKS": [
+            "drf_spectacular.hooks.postprocess_schema_enums",
+            "drf_spectacular.contrib.djangorestframework_camel_case."
+            "camelize_serializer_fields",
+        ],
+    }
+)
+def test_support_for_drf_camelcase():
+    class Dummy(PolymorphicSerializer):
+        camel_case = serializers.ChoiceField(choices=["foo", "bar"])
+        serializer_mapping = {}
+        discriminator_field = "camel_case"
+
+    class XView(views.APIView):
+        serializer_class = Dummy
+
+        def get(self, *args, **kwargs): ...
+
+    schema = generate_schema("x", view=XView)
+
+    assert "Dummy" in schema["components"]["schemas"]
+    discriminator = schema["components"]["schemas"]["Dummy"]["discriminator"]
+    assert discriminator["propertyName"] == "camelCase"

@@ -1,7 +1,30 @@
+from typing import TYPE_CHECKING
+
+from drf_spectacular.contrib.djangorestframework_camel_case import (
+    camelize_serializer_fields,
+)
 from drf_spectacular.extensions import OpenApiSerializerExtension
 from drf_spectacular.plumbing import ResolvedComponent, build_object_type
+from drf_spectacular.settings import spectacular_settings
 
 from .serializers import PolymorphicSerializer
+
+
+def maybe_camelize(key: str) -> str:
+    """
+    If the hook to camelize schema fields is installed, camelize the value.
+    """
+    if camelize_serializer_fields not in spectacular_settings.POSTPROCESSING_HOOKS:
+        return key
+
+    from djangorestframework_camel_case.util import (  # type: ignore[import-untyped]
+        camelize,
+    )
+
+    # camelize doesn't support running it on a string directly, it only processes keys
+    # of dicts
+    camelized_wrapper = camelize({key: None})
+    return next((key for key in camelized_wrapper.keys()))
 
 
 class PolymorphicSerializerExtension(OpenApiSerializerExtension):
@@ -22,6 +45,8 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
     def map_serializer(self, auto_schema, direction):
         sub_components = []
         serializer = self.target
+        if TYPE_CHECKING:
+            assert isinstance(serializer, PolymorphicSerializer)
         base_name = self._get_name_base()
 
         # get the base serializer
@@ -87,7 +112,7 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
         return {
             "oneOf": [dict(ref) for ref in unique_refs],
             "discriminator": {
-                "propertyName": serializer.discriminator_field,
+                "propertyName": maybe_camelize(serializer.discriminator_field),
                 "mapping": {
                     resource_type: ref["$ref"] for resource_type, ref in sub_components
                 },
