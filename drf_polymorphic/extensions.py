@@ -57,7 +57,7 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
             schema=auto_schema._map_basic_serializer(serializer, direction),
             object=serializer,
         )
-        auto_schema.registry.register(main)
+        auto_schema.registry.register_on_missing(main)
 
         # build the components for the polymorphic extra fields
         for (
