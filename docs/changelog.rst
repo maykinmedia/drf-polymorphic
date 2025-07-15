@@ -2,6 +2,15 @@
 Changelog
 =========
 
+2.1.1 (2025-07-15)
+==================
+
+Schema generation bugfix release.
+
+* Fixed splitting patch schema generation when ``COMPONENT_SPLIT_PATCH`` is enabled.
+* Fixed warning during schema generation for duplicated registrations of component
+  schemas.
+
 2.1.0 (2025-07-04)
 ==================
 

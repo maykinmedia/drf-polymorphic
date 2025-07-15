@@ -1,7 +1,7 @@
 DRF-polymorphic
 ===============
 
-:Version: 2.1.0
+:Version: 2.1.1
 :Source: https://github.com/maykinmedia/drf-polymorphic
 :Keywords: django, rest, polymorphic
 
