@@ -1,13 +1,26 @@
 from django.db import models
 
+import pytest
+from drf_spectacular.drainage import GENERATOR_STATS
 from drf_spectacular.settings import patched_settings
-from rest_framework import serializers, status, views
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import serializers, status, views, viewsets
 from rest_framework.reverse import reverse
 
 from drf_polymorphic.serializers import PolymorphicSerializer
 
 from . import assert_schema
 from .schema import generate_schema
+
+
+@pytest.fixture(autouse=True)
+def fail_on_warnings_in_schema_generation():
+    GENERATOR_STATS.enable_trace_lineno()
+    GENERATOR_STATS.enable_color()
+    yield
+    GENERATOR_STATS.emit_summary()
+    if GENERATOR_STATS:
+        pytest.fail("Schema generation produces warnings")
 
 
 def test_get_schema(api_client):
@@ -189,3 +202,37 @@ def test_support_for_drf_camelcase():
     assert "Dummy" in schema["components"]["schemas"]
     discriminator = schema["components"]["schemas"]["Dummy"]["discriminator"]
     assert discriminator["propertyName"] == "camelCase"
+
+
+@patched_settings({"COMPONENT_SPLIT_PATCH": True})
+def test_only_register_component_once():
+    class NestedSerializer(serializers.Serializer):
+        pass
+
+    class Dummy(PolymorphicSerializer):
+        object_type = serializers.ChoiceField(choices=["foo", "bar"])
+        serializer_mapping = {
+            "foo": NestedSerializer,
+            "bar": NestedSerializer,
+        }
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="id", type=int, location=OpenApiParameter.PATH)
+        ]
+    )
+    class XViewSet(viewsets.ViewSet):
+        def get_serializer_class(self):
+            return Dummy
+
+        def create(self, *args, **kwargs): ...
+        def partial_update(self, *args, **kwargs): ...
+
+    schema = generate_schema(route="x", viewset=XViewSet)
+
+    schemas = schema["components"]["schemas"]
+    assert "Dummy" in schemas
+    assert "required" in schemas["DummyShared"]
+
+    assert "PatchedDummy" in schemas
+    assert "required" not in schemas["PatchedDummyShared"]
