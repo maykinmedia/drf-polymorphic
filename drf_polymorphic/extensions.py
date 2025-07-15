@@ -4,7 +4,11 @@ from drf_spectacular.contrib.djangorestframework_camel_case import (
     camelize_serializer_fields,
 )
 from drf_spectacular.extensions import OpenApiSerializerExtension
-from drf_spectacular.plumbing import ResolvedComponent, build_object_type
+from drf_spectacular.plumbing import (
+    ResolvedComponent,
+    build_object_type,
+    is_patched_serializer,
+)
 from drf_spectacular.settings import spectacular_settings
 
 from .serializers import PolymorphicSerializer
@@ -51,8 +55,14 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
 
         # get the base serializer
 
+        name_prefix = (
+            "Patched"
+            if is_patched_serializer(serializer=serializer, direction=direction)
+            else ""
+        )
+
         main = ResolvedComponent(
-            name=f"{base_name}Shared",
+            name=f"{name_prefix}{base_name}Shared",
             type=ResolvedComponent.SCHEMA,
             schema=auto_schema._map_basic_serializer(serializer, direction),
             object=serializer,
@@ -90,7 +100,7 @@ class PolymorphicSerializerExtension(OpenApiSerializerExtension):
                 resolved = generic
 
             combined = ResolvedComponent(
-                name=f"{base_name}{resolved.name}",
+                name=f"{name_prefix}{base_name}{resolved.name}",
                 type=ResolvedComponent.SCHEMA,
                 schema={
                     "allOf": [

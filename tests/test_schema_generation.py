@@ -232,3 +232,7 @@ def test_only_register_component_once():
 
     schemas = schema["components"]["schemas"]
     assert "Dummy" in schemas
+    assert "required" in schemas["DummyShared"]
+
+    assert "PatchedDummy" in schemas
+    assert "required" not in schemas["PatchedDummyShared"]
